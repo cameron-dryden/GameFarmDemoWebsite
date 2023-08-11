@@ -1,0 +1,4 @@
+<ng-container *ngIf="position">
+    <map-marker [options]="markerOptions" [position]="position" (mapClick)="selectionManger.updateSelectedDrone(drone)">
+    </map-marker>
+</ng-container>

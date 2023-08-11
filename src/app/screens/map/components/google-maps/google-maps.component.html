@@ -1,7 +1,12 @@
-<ng-container *ngIf="apiLoaded | async">
-    <google-map height="100%" width="100%" [options]="options">
-        <ng-container *ngFor="let marker of markers">
-            <map-marker [position]="marker.position" [label]="marker.label ? marker.label : ''"></map-marker>
+<div [ngStyle]="{'width': '100%', 'height': '100%', 'position': 'relative'}">
+    <google-map #googleMap height="100%" width="100%" [options]="options">
+        <ng-container *ngIf="boundaryPath.length > 0">
+            <map-polygon [paths]="boundaryPath" [options]="boundary"></map-polygon>
+        </ng-container>
+        <ng-container *ngFor="let drone of drones">
+            <app-drone [drone]="drone"></app-drone>
         </ng-container>
     </google-map>
-</ng-container>
+    <app-video-player *ngIf="selectedDroneSN" [droneSN]="selectedDroneSN"
+        [ngStyle]="{'position': 'absolute', 'top': '0', 'right': '0', 'width': '40%'}"></app-video-player>
+</div>

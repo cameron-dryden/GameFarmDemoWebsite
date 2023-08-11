@@ -1,40 +1,88 @@
-import { Component, Input } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { MarkerOptions } from '../../interfaces/MarkerOptions.interface';
+import { Component, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { GoogleMap } from '@angular/google-maps';
+import { SelectionManagerService } from '../../services/selection-manager.service';
+import { Record } from 'pocketbase';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-google-maps',
   templateUrl: './google-maps.component.html',
   styleUrls: ['./google-maps.component.scss'],
 })
-export class GoogleMapsComponent {
-  @Input() markers: MarkerOptions[] = [];
+export class GoogleMapsComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('googleMap', { static: true }) googleMap!: GoogleMap;
 
-  apiLoaded: Observable<boolean>;
+  selectedPlaceService!: Subscription;
+  selectedDroneService!: Subscription;
+
+  selectedDroneSN: string | undefined = undefined;
 
   options: google.maps.MapOptions = {
     clickableIcons: false,
     disableDefaultUI: true,
     keyboardShortcuts: false,
     mapTypeId: 'satellite',
-    center: { lat: -33.848772494404756, lng: 18.63915806767608 },
   };
 
-  constructor(httpClient: HttpClient) {
-    // If you're using the `<map-heatmap-layer>` directive, you also have to include the `visualization` library
-    // when loading the Google Maps API. To do so, you can add `&libraries=visualization` to the script URL:
-    // https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization
+  boundary: google.maps.PolygonOptions = {
+    clickable: false,
+    fillOpacity: 0,
+    strokeColor: 'red',
+  };
+  boundaryPath: google.maps.LatLngLiteral[] = [];
 
-    this.apiLoaded = httpClient
-      .jsonp(
-        'https://maps.googleapis.com/maps/api/js?key=AIzaSyADm9Cc3ZLn8fR0BwEE-tfzeKMYBWOtxMc',
-        'callback'
-      )
-      .pipe(
-        map(() => true),
-        catchError(() => of(false))
-      );
+  drones: string[] = [];
+
+  constructor(private selectionManger: SelectionManagerService) {}
+
+  ngAfterViewInit() {
+    this.selectedPlaceService = this.selectionManger.selectedPlace.subscribe(
+      (place) => {
+        if (place) {
+          this.googleMap.panTo({
+            lat: place['locationCenter'].latitude,
+            lng: place['locationCenter'].longitude,
+          });
+
+          this.updateMapSettings(place);
+        }
+      }
+    );
+
+    this.selectedDroneService = this.selectionManger.selectedDrone.subscribe(
+      (drone) => {
+        if (drone) {
+          this.googleMap.panTo({
+            lat: drone['position'].latitude,
+            lng: drone['position'].longitude,
+          });
+
+          this.selectedDroneSN = drone['serialNumber'];
+        } else {
+          this.selectedDroneSN = undefined;
+        }
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.selectedPlaceService.unsubscribe();
+    this.selectedDroneService.unsubscribe();
+  }
+
+  updateMapSettings(place: Record) {
+    // Set map bounds (use lat or lon to determine boundaries)
+
+    this.boundaryPath = [];
+    if (place['locationBoundary'] !== null) {
+      for (let vertices of place['locationBoundary']) {
+        this.boundaryPath.push({
+          lat: vertices.latitude,
+          lng: vertices.longitude,
+        });
+      }
+    }
+
+    this.drones = place['drones'];
   }
 }

@@ -1,0 +1,24 @@
+<mat-accordion multi="false">
+    <mat-expansion-panel *ngFor="let place of places" (opened)="placeSelected(place['id'])"
+        [expanded]="selectedPlace && (selectedPlace['id'] === place['id'])">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{place['name']}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-accordion multi="false">
+            <mat-expansion-panel *ngFor="let drone of getDrones(place)" (opened)="droneSelected(drone['id'])"
+                [expanded]="selectedDrone && (selectedDrone['id'] === drone['id'])">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{drone['serialNumber']}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                Drone details
+                <!-- <app-drone-details [drone]="drone"></app-drone-details> -->
+            </mat-expansion-panel>
+        </mat-accordion>
+
+    </mat-expansion-panel>
+</mat-accordion>

@@ -13,21 +13,31 @@ import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { NavbarComponent } from './navbar/navbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { GoogleMapsComponent } from './screens/map/components/google-maps/google-maps.component';
 import { MapComponent } from './screens/map/map.component';
 import { SettingsComponent } from './screens/settings/settings.component';
+import { PocketbaseService } from './services/pocketbase.service';
+import { DroneComponent } from './screens/map/components/google-maps/components/drone/drone.component';
+import { InfoPanelComponent } from './screens/map/components/info-panel/info-panel.component';
+import { SelectionManagerService } from './screens/map/services/selection-manager.service';
+import { DroneDetailsComponent } from './screens/map/components/info-panel/components/drone-details/drone-details.component';
+import { RealtimeService } from './services/realtime.service';
+import { VideoPlayerComponent } from './screens/map/components/google-maps/components/video-player/video-player.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavbarComponent,
     GoogleMapsComponent,
     MapComponent,
-    SettingsComponent
+    SettingsComponent,
+    DroneComponent,
+    InfoPanelComponent,
+    DroneDetailsComponent,
+    VideoPlayerComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,8 +55,9 @@ import { SettingsComponent } from './screens/settings/settings.component';
     GoogleMapsModule,
     HttpClientModule,
     HttpClientJsonpModule,
+    MatExpansionModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [PocketbaseService, SelectionManagerService, RealtimeService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

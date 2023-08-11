@@ -1,1 +1,8 @@
-<app-google-maps [markers]="droneMarker ? [droneMarker] : []"></app-google-maps>
+<ng-container *ngIf="!isLoading; else loading">
+    <app-google-maps></app-google-maps>
+    <app-info-panel [places]="places"></app-info-panel>
+</ng-container>
+
+<ng-template #loading>
+    <h1>Loading...</h1>
+</ng-template>

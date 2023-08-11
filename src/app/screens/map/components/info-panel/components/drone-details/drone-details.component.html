@@ -1,0 +1,22 @@
+<div>
+    <div>
+        <h3>Flight Status:</h3>
+        <p>{{drone['flightStatus']}}</p>
+    </div>
+    <div>
+        <h3>Satellite Signal:</h3>
+        <p>{{drone['satelliteSignal']}}</p>
+    </div>
+    <div>
+        <h3>Wind Status:</h3>
+        <p>{{drone['windStatus']}}</p>
+    </div>
+    <div>
+        <h3>Altitude:</h3>
+        <p>{{drone['position'].altitude}}</p>
+    </div>
+    <div>
+        <h3>Velocity:</h3>
+        <p>{{drone['position'].velocity.x}} : {{drone['position'].velocity.y}} : {{drone['position'].velocity.z}}</p>
+    </div>
+</div>

@@ -1,0 +1,6 @@
+<div class="video-player" style="position: relative;">
+    <h4 [ngStyle]="{'position': 'absolute', 'top': '5px', 'left': '5px', 'z-index': '1', 'margin': '0'}">
+        DRONE FEED</h4>
+    <video #target class="video-js" muted playsinline preload="none" (click)="togglePlayPause()"
+        style="width: 100%"></video>
+</div>

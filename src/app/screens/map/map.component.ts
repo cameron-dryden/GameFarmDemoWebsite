@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { LiveDroneData } from './interfaces/LiveDroneData.interface';
-import { MarkerOptions } from './interfaces/MarkerOptions.interface';
+import { Record } from 'pocketbase';
+import { PocketbaseService } from 'src/app/services/pocketbase.service';
+import { SelectionManagerService } from './services/selection-manager.service';
 
 @Component({
   selector: 'app-map',
@@ -9,33 +9,28 @@ import { MarkerOptions } from './interfaces/MarkerOptions.interface';
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit {
-  droneData: LiveDroneData | null = null;
-  droneMarker!: MarkerOptions;
+  places: Record[] = [];
+  isLoading: boolean = true;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private pocketbase: PocketbaseService,
+    private selectionManger: SelectionManagerService
+  ) {}
 
   ngOnInit(): void {
-    this.httpClient
-      .get<LiveDroneData>('http://192.168.186.2:3000/api/drone')
-      .subscribe((response) => {
-        console.log(response);
-        this.droneData = response;
-        this.updateDroneMapMarker(this.droneData);
-      });
+    this.loadPlaces().then((places) => {
+      this.places = places;
+      this.selectionManger.updateSelectedPlace(places[0]);
+
+      this.isLoading = false;
+    });
   }
 
-  updateDroneMapMarker(droneData: LiveDroneData): void {
-    if (droneData) {
-      console.log('We have data');
-      if (
-        droneData.position.latitude !== null &&
-        droneData.position.longitude !== null
-      ) {
-        console.log('The data has values');
-        this.droneMarker.position.lat = droneData.position.latitude;
-        this.droneMarker.position.lng = droneData.position.longitude;
-        this.droneMarker.label = 'Drone';
-      }
-    }
+  async loadPlaces() {
+    const places = await this.pocketbase.pb.collection('places').getFullList({
+      filter: 'owners.name ~ "Cameron"',
+      expand: 'drones',
+    });
+    return places;
   }
 }
